@@ -38,7 +38,7 @@ const zdw = function() {
                 }
                 this.age += 1;
             },
-            coo: function() { return coo(this.pos.x, this.pos.y); },
+            coo: function() { return coo(this.pos); },
             harvest: function () { this.state = "."; this.age = 1; }
         };
     }
@@ -69,18 +69,19 @@ const zdw = function() {
         pos: { x: 3, y: 2 },
         character: "@", // "🏃"
         move: function (relX, relY) {
-            const x = this.pos.x + relX;
-            const y = this.pos.y + relY;
-            const dest = map[coo(x, y)];
-            this.pos.x += behavior[dest] * relX;
-            this.pos.y += behavior[dest] * relY;
+            const {x, y} = this.pos
+            const pos = { x: x + relX, y: y + relY };
+            const beh =  behavior[map[coo(pos)]];
+            this.pos = { x: x + beh*relX, y: y + beh*relY };
             moves += 1;
+
         },
-        coo: function() { return coo(this.pos.x, this.pos.y); },
+        coo: function() { return coo(this.pos); },
         sow: function() {  }
     };
 
-    const coo = function(x, y) {
+    const coo = function(pos) {
+        const { x, y } = pos;
         const width = 10 + 1;
         return y*width + x;
     }
@@ -96,7 +97,6 @@ const zdw = function() {
         dir[event.key]();
         setf();
     })
-
 
 }
 
