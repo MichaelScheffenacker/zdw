@@ -1,0 +1,13 @@
+body {
+    background-color: #333333;
+    color: #999999;
+}
+
+#zdw-container {
+    border: #999999 solid 1px;
+    line-height: 0.6em;
+}
+
+#zdw-world {
+    white-space: pre;
+}
