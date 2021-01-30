@@ -6,11 +6,11 @@ window.onload = function () {
 
 const zdw = function() {
 
-    const w = document.getElementById('zdw-world');
+    const world = document.getElementById('zdw-world');
 
     let moves = 0;
 
-    const bb = {
+    const behavior = {
         "▓": 0,
         " ": 1,
         ".": 1,
@@ -20,14 +20,15 @@ const zdw = function() {
     }
 
     const Seed = function (x, y) {
-        const random = getRandomInt(4);
+        const sproutTime = 10 + getRandomInt(10);
+        const growTime = 20 + getRandomInt(30);
         return {
             pos: { x: x, y: y },
             state: ".",
             age: 1,
             stages:{
-                ".": { age: 10+random, next: "x" },
-                "x": { age: 20+random*3, next: "X" },
+                ".": { age: sproutTime, next: "x" },
+                "x": { age: growTime, next: "X" },
                 "X": { age: 0, next: ""}
             },
             cycle: function () {
@@ -54,14 +55,14 @@ const zdw = function() {
     ];
 
     const setf = function () {
-        let a = bg.split("");
+        let linMap = map.split("");
         seeds.forEach( function(seed) {
             seed.cycle();
-            a[seed.coo()] = seed.state;
-            a[dweller.coo()] = dweller.character;
+            linMap[seed.coo()] = seed.state;
+            linMap[dweller.coo()] = dweller.character;
         });
-        a = a.join("");
-        w.innerText = a;
+        linMap = linMap.join("");
+        world.innerText = linMap;
     };
 
     const dweller = {
@@ -70,9 +71,9 @@ const zdw = function() {
         move: function (relX, relY) {
             const x = this.pos.x + relX;
             const y = this.pos.y + relY;
-            const dest = bg[coo(x, y)];
-            this.pos.x += bb[dest] * relX;
-            this.pos.y += bb[dest] * relY;
+            const dest = map[coo(x, y)];
+            this.pos.x += behavior[dest] * relX;
+            this.pos.y += behavior[dest] * relY;
             moves += 1;
         },
         coo: function() { return coo(this.pos.x, this.pos.y); },
@@ -99,7 +100,7 @@ const zdw = function() {
 
 }
 
-const bg =
+const map =
 `▓▓▓▓▓▓▓▓▓▓
 ▓    ▓   ▓
 ▓    O   ▓
