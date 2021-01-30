@@ -9,14 +9,16 @@ const zdw = function() {
     const world = document.getElementById('zdw-world');
 
     let moves = 0;
+    let crops = 0;
 
     const behavior = {
         "▓": 0,
         " ": 1,
         ".": 1,
         "x": 1,
-        "X": 1,
-        "O": -1
+        "X": 0,
+        "O": -1,
+        "n": 0,
     }
 
     const Seed = function (x, y) {
@@ -54,6 +56,9 @@ const zdw = function() {
         Seed(2, 4)
     ];
 
+    const Seeds = {};
+    seeds.forEach(function (seed) { Seeds[seed.coo()] = seed });
+
     const setf = function () {
         let linMap = map.split("");
         seeds.forEach( function(seed) {
@@ -71,20 +76,31 @@ const zdw = function() {
         move: function (relX, relY) {
             const {x, y} = this.pos
             const pos = { x: x + relX, y: y + relY };
-            const beh =  behavior[map[coo(pos)]];
+            let coord = coo(pos);
+            console.log(coord in Seeds ? Seeds[coord].state : 0)
+            const beh = coord in Seeds ? behavior[Seeds[coord].state] : behavior[map[coord]] ;  // We need to find a generalized solution for that ...
             this.pos = { x: x + beh*relX, y: y + beh*relY };
             moves += 1;
+
+            console.log(seeds);
+
+            if (coord in Seeds) {
+                const seed = Seeds[coord];
+                if (seed.state === "X") {
+                    seed.harvest();
+                    crops += 1;
+                }
+            }
+
+            document.getElementById("moves-value").innerText = moves;
+            document.getElementById("crops-value").innerText = crops;
 
         },
         coo: function() { return coo(this.pos); },
         sow: function() {  }
     };
 
-    const coo = function(pos) {
-        const { x, y } = pos;
-        const width = 10 + 1;
-        return y*width + x;
-    }
+
 
     setf();
     document.addEventListener('keypress', (event) => {
@@ -110,4 +126,10 @@ const map =
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * Math.floor(max));
+}
+
+const coo = function(pos) {
+    const { x, y } = pos;
+    const width = 10 + 1;
+    return y*width + x;
 }
