@@ -10,6 +10,7 @@ const zdw = function() {
 
     let moves = 0;
     let crops = 0;
+    let credits = 0;
 
     const behavior = {
         "▓": 0,
@@ -19,6 +20,8 @@ const zdw = function() {
         "X": 0,
         "O": -1,
         "n": 0,
+        "#": 0,
+        "@": 0,
     }
 
     const Seed = function (x, y) {
@@ -45,6 +48,16 @@ const zdw = function() {
         };
     }
 
+    const merchant = {
+        pos: { x: 7, y: 2 },
+        buy: function(amount) {
+            const unitPrice = 2;
+            const payout = unitPrice * amount;
+            return payout;
+        },
+        coo: function() { return coo(this.pos); }
+    }
+
     const seeds = [
         Seed(1, 1),
         Seed(2, 1),
@@ -66,6 +79,7 @@ const zdw = function() {
             linMap[seed.coo()] = seed.state;
             linMap[dweller.coo()] = dweller.character;
         });
+        linMap[merchant.coo()] = "#"
         linMap = linMap.join("");
         world.innerText = linMap;
     };
@@ -77,12 +91,9 @@ const zdw = function() {
             const {x, y} = this.pos
             const pos = { x: x + relX, y: y + relY };
             let coord = coo(pos);
-            console.log(coord in Seeds ? Seeds[coord].state : 0)
             const beh = coord in Seeds ? behavior[Seeds[coord].state] : behavior[map[coord]] ;  // We need to find a generalized solution for that ...
             this.pos = { x: x + beh*relX, y: y + beh*relY };
             moves += 1;
-
-            console.log(seeds);
 
             if (coord in Seeds) {
                 const seed = Seeds[coord];
@@ -92,12 +103,22 @@ const zdw = function() {
                 }
             }
 
+            if (coord === merchant.coo()) {
+                this.sell(merchant);
+            }
+
             document.getElementById("moves-value").innerText = moves;
             document.getElementById("crops-value").innerText = crops;
+            document.getElementById("credits-value").innerText = credits;
 
         },
         coo: function() { return coo(this.pos); },
-        sow: function() {  }
+        sow: function() {  },
+        sell: function(merchant) {
+            const payout = merchant.buy(crops);
+            crops = 0;
+            credits += payout;
+        }
     };
 
 
