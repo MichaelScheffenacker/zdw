@@ -25,10 +25,10 @@ const zdw = function() {
     }
 
     const Seed = function (x, y) {
-        const sproutTime = 10 + getRandomInt(10);
-        const growTime = 20 + getRandomInt(30);
+        const sproutTime = 10 + u.rand(10);
+        const growTime = 20 + u.rand(30);
         return {
-            pos: pos(x, y),
+            pos: u.pos(x, y),
             state: ".",
             age: 1,
             stages:{
@@ -43,19 +43,19 @@ const zdw = function() {
                 }
                 this.age += 1;
             },
-            coo: function() { return coo(this.pos); },
+            coo: function() { return u.coo(this.pos); },
             harvest: function () { this.state = "."; this.age = 1; }
         };
     }
 
     const merchant = {
-        pos: pos(7, 2),
+        pos: u.pos(7, 2),
         buy: function(amount) {
             const unitPrice = 2;
             const payout = unitPrice * amount;
             return payout;
         },
-        coo: function() { return coo(this.pos); }
+        coo: function() { return u.coo(this.pos); }
     }
 
     const seeds = [
@@ -85,12 +85,12 @@ const zdw = function() {
     };
 
     const dweller = {
-        pos: pos(3, 2),
+        pos: u.pos(3, 2),
         character: "@", // "🏃"
         move: function (relX, relY) {
-            let targetCoo = coo(trans(this.pos,relX, relY));
+            let targetCoo = u.coo(u.trans(this.pos,relX, relY));
             const beh = targetCoo in Seeds ? behavior[Seeds[targetCoo].state] : behavior[map[targetCoo]] ;  // We need to find a generalized solution for that ...
-            this.pos = trans(this.pos, beh*relX, beh*relY );
+            this.pos = u.trans(this.pos, beh*relX, beh*relY );
             moves += 1;
 
             if (targetCoo in Seeds) {
@@ -110,7 +110,7 @@ const zdw = function() {
             document.getElementById("credits-value").innerText = credits;
 
         },
-        coo: function() { return coo(this.pos); },
+        coo: function() { return u.coo(this.pos); },
         sow: function() {  },
         sell: function(merchant) {
             const payout = merchant.buy(crops);
@@ -143,20 +143,19 @@ const map =
 ▓    ▓   ▓
 ▓▓▓▓▓▓▓▓▓▓`
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * Math.floor(max));
-}
-
-const coo = function(pos) {
-    const { x, y } = pos;
-    const width = 10 + 1;
-    return y*width + x;
-}
-
-const pos = function(x, y) {
-    return { x: x, y: y };
-}
-
-const trans = function(startPos, x, y) {
-    return pos(startPos.x + x, startPos.y + y);
+const u = {
+    coo: function(pos) {
+        const { x, y } = pos;
+        const width = 10 + 1;
+        return y*width + x;
+    },
+    pos: function(x, y) {
+        return { x: x, y: y };
+    },
+    trans: function(pos, x, y) {
+        return u.pos(pos.x + x, pos.y + y);
+    },
+    rand: function(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
 }
