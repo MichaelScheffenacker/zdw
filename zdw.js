@@ -9,7 +9,7 @@ const zdw = function() {
     const world = document.getElementById('zdw-world');
 
     let moves = 0;
-    let crops = 0;
+    let crops = 5;
     let credits = 0;
 
     const behavior = {
@@ -84,6 +84,27 @@ const zdw = function() {
         world.innerText = linMap;
     };
 
+    const environment = function (coo) {
+
+        moves += 1;
+
+        if (coo in Seeds) {
+            const seed = Seeds[coo];
+            if (seed.state === "X") {
+                seed.harvest();
+                crops += 1;
+            }
+        }
+
+        if (coo === merchant.coo()) {
+            dweller.sell(merchant);
+        }
+
+        document.getElementById("moves-value").innerText = moves;
+        document.getElementById("crops-value").innerText = crops;
+        document.getElementById("credits-value").innerText = credits;
+    }
+
     const dweller = {
         pos: u.pos(3, 2),
         character: "@", // "🏃"
@@ -91,24 +112,7 @@ const zdw = function() {
             let targetCoo = u.coo(u.trans(this.pos,relX, relY));
             const beh = targetCoo in Seeds ? behavior[Seeds[targetCoo].state] : behavior[map[targetCoo]] ;  // We need to find a generalized solution for that ...
             this.pos = u.trans(this.pos, beh*relX, beh*relY );
-            moves += 1;
-
-            if (targetCoo in Seeds) {
-                const seed = Seeds[targetCoo];
-                if (seed.state === "X") {
-                    seed.harvest();
-                    crops += 1;
-                }
-            }
-
-            if (targetCoo === merchant.coo()) {
-                this.sell(merchant);
-            }
-
-            document.getElementById("moves-value").innerText = moves;
-            document.getElementById("crops-value").innerText = crops;
-            document.getElementById("credits-value").innerText = credits;
-
+            environment(targetCoo);
         },
         coo: function() { return u.coo(this.pos); },
         sow: function() {  },
