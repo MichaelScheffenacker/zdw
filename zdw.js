@@ -28,7 +28,7 @@ const zdw = function() {
         const sproutTime = 10 + getRandomInt(10);
         const growTime = 20 + getRandomInt(30);
         return {
-            pos: { x: x, y: y },
+            pos: pos(x, y),
             state: ".",
             age: 1,
             stages:{
@@ -49,7 +49,7 @@ const zdw = function() {
     }
 
     const merchant = {
-        pos: { x: 7, y: 2 },
+        pos: pos(7, 2),
         buy: function(amount) {
             const unitPrice = 2;
             const payout = unitPrice * amount;
@@ -85,25 +85,23 @@ const zdw = function() {
     };
 
     const dweller = {
-        pos: { x: 3, y: 2 },
+        pos: pos(3, 2),
         character: "@", // "🏃"
         move: function (relX, relY) {
-            const {x, y} = this.pos
-            const pos = { x: x + relX, y: y + relY };
-            let coord = coo(pos);
-            const beh = coord in Seeds ? behavior[Seeds[coord].state] : behavior[map[coord]] ;  // We need to find a generalized solution for that ...
-            this.pos = { x: x + beh*relX, y: y + beh*relY };
+            let targetCoo = coo(trans(this.pos,relX, relY));
+            const beh = targetCoo in Seeds ? behavior[Seeds[targetCoo].state] : behavior[map[targetCoo]] ;  // We need to find a generalized solution for that ...
+            this.pos = trans(this.pos, beh*relX, beh*relY );
             moves += 1;
 
-            if (coord in Seeds) {
-                const seed = Seeds[coord];
+            if (targetCoo in Seeds) {
+                const seed = Seeds[targetCoo];
                 if (seed.state === "X") {
                     seed.harvest();
                     crops += 1;
                 }
             }
 
-            if (coord === merchant.coo()) {
+            if (targetCoo === merchant.coo()) {
                 this.sell(merchant);
             }
 
@@ -153,4 +151,12 @@ const coo = function(pos) {
     const { x, y } = pos;
     const width = 10 + 1;
     return y*width + x;
+}
+
+const pos = function(x, y) {
+    return { x: x, y: y };
+}
+
+const trans = function(startPos, x, y) {
+    return pos(startPos.x + x, startPos.y + y);
 }
