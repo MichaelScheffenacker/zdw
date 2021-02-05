@@ -44,7 +44,13 @@ const zdw = function() {
                 this.age += 1;
             },
             coo: function() { return u.coo(this.pos); },
-            harvest: function () { this.state = "."; this.age = 1; }
+            harvest: function () {
+                if (this.state === "X") {
+                    this.state = ".";
+                    this.age = 1;
+                    crops += 1;  // todo: global variable
+                }
+            }
         };
     }
 
@@ -90,16 +96,14 @@ const zdw = function() {
 
         if (coo in Seeds) {
             const seed = Seeds[coo];
-            if (seed.state === "X") {
-                seed.harvest();
-                crops += 1;
-            }
+            seed.harvest();
         }
 
         if (coo === merchant.coo()) {
             dweller.sell(merchant);
         }
 
+        // todo: move updates to the methods?
         document.getElementById("moves-value").innerText = moves;
         document.getElementById("crops-value").innerText = crops;
         document.getElementById("credits-value").innerText = credits;
@@ -118,7 +122,7 @@ const zdw = function() {
         sow: function() {  },
         sell: function(merchant) {
             const payout = merchant.buy(crops);
-            crops = 0;
+            crops = 0;          // todo: global variables
             credits += payout;
         }
     };
