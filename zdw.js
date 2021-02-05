@@ -4,7 +4,7 @@ window.onload = function () {
     zdw();
 }
 
-const zdw = function() {
+const zdw = function () {
 
     const world = document.getElementById('zdw-world');
 
@@ -31,10 +31,10 @@ const zdw = function() {
             pos: u.pos(x, y),
             state: ".",
             age: 1,
-            stages:{
-                ".": { age: sproutTime, next: "x" },
-                "x": { age: growTime, next: "X" },
-                "X": { age: 0, next: ""}
+            stages: {
+                ".": {age: sproutTime, next: "x"},
+                "x": {age: growTime, next: "X"},
+                "X": {age: 0, next: ""}
             },
             cycle: function () {
                 const stage = this.stages[this.state];
@@ -43,25 +43,36 @@ const zdw = function() {
                 }
                 this.age += 1;
             },
-            coo: function() { return u.coo(this.pos); },
+            coo: function () {
+                return u.coo(this.pos);
+            },
             harvest: function () {
                 if (this.state === "X") {
                     this.state = ".";
                     this.age = 1;
                     crops += 1;  // todo: global variable
                 }
+            },
+            action: function () {
+                this.harvest();
             }
         };
     }
 
     const merchant = {
         pos: u.pos(7, 2),
-        buy: function(amount) {
+        buy: function (amount) {
             const unitPrice = 2;
-            const payout = unitPrice * amount;
-            return payout;
+            return unitPrice * amount;  // payout
         },
-        coo: function() { return u.coo(this.pos); }
+        coo: function () {
+            return u.coo(this.pos);
+        },
+        action: function () {
+            const payout = this.buy(crops);
+            crops = 0;          // todo: global variables
+            credits += payout;
+        }
     }
 
     const seeds = [
@@ -76,11 +87,19 @@ const zdw = function() {
     ];
 
     const Seeds = {};
-    seeds.forEach(function (seed) { Seeds[seed.coo()] = seed });
+    seeds.forEach(function (seed) {
+        Seeds[seed.coo()] = seed;
+    });
+
+    const objects = {};
+    seeds.forEach(function (seed) {
+        objects[seed.coo()] = seed;
+    });
+    objects[merchant.coo()] = merchant;
 
     const setf = function () {
         let linMap = map.split("");
-        seeds.forEach( function(seed) {
+        seeds.forEach(function (seed) {
             seed.cycle();
             linMap[seed.coo()] = seed.state;
             linMap[dweller.coo()] = dweller.character;
@@ -94,13 +113,8 @@ const zdw = function() {
 
         moves += 1;
 
-        if (coo in Seeds) {
-            const seed = Seeds[coo];
-            seed.harvest();
-        }
-
-        if (coo === merchant.coo()) {
-            dweller.sell(merchant);
+        if (coo in objects) {
+            objects[coo].action(dweller);
         }
 
         // todo: move updates to the methods?
@@ -113,21 +127,18 @@ const zdw = function() {
         pos: u.pos(3, 2),
         character: "@", // "🏃"
         move: function (relX, relY) {
-            let targetCoo = u.coo(u.trans(this.pos,relX, relY));
-            const beh = targetCoo in Seeds ? behavior[Seeds[targetCoo].state] : behavior[map[targetCoo]] ;  // We need to find a generalized solution for that ...
-            this.pos = u.trans(this.pos, beh*relX, beh*relY );
+            let targetCoo = u.coo(u.trans(this.pos, relX, relY));
+            const beh = targetCoo in Seeds ? behavior[Seeds[targetCoo].state] : behavior[map[targetCoo]];  // We need to find a generalized solution for that ...
+            this.pos = u.trans(this.pos, beh * relX, beh * relY);
             environment(targetCoo);
         },
-        coo: function() { return u.coo(this.pos); },
-        sow: function() {  },
-        sell: function(merchant) {
-            const payout = merchant.buy(crops);
-            crops = 0;          // todo: global variables
-            credits += payout;
-        }
+        coo: function () {
+            return u.coo(this.pos);
+        },
+        sow: function () {
+        },
+
     };
-
-
 
     setf();
     document.addEventListener('keypress', (event) => {
@@ -152,18 +163,18 @@ const map =
 ▓▓▓▓▓▓▓▓▓▓`
 
 const u = {
-    coo: function(pos) {
-        const { x, y } = pos;
+    coo: function (pos) {
+        const {x, y} = pos;
         const width = 10 + 1;
-        return y*width + x;
+        return y * width + x;
     },
-    pos: function(x, y) {
-        return { x: x, y: y };
+    pos: function (x, y) {
+        return {x: x, y: y};
     },
-    trans: function(pos, x, y) {
+    trans: function (pos, x, y) {
         return u.pos(pos.x + x, pos.y + y);
     },
-    rand: function(max) {
+    rand: function (max) {
         return Math.floor(Math.random() * Math.floor(max));
     }
 }
