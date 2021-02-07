@@ -69,36 +69,36 @@ const zdw = function () {
     }
 
     const seeds = [];
-    linMap.forEach((char, coo) => {
-        if (char === ".") seeds.push(Seed(u.toPos(coo)));
+    linMap.forEach((char, pos) => {
+        if (char === ".") seeds.push(Seed(pos));
     });
 
     const objects = {};
     seeds.forEach(function (seed) {
-        objects[seed.coo()] = seed;
+        objects[seed.pos] = seed;
     });
-    objects[merchant.coo()] = merchant;
+    objects[merchant.pos] = merchant;
 
 
     const render = function () {
-        linMap[u.coo(dweller.background.pos)] = dweller.background.char;    // todo: refactor preservation of the background.
-        dweller.background.pos = dweller.pos;                               // More comfortable: separating static from movable objects, and keep the background information that way.
-        dweller.background.char = linMap[dweller.coo()];
+        linMap[dweller.background.pos] = dweller.background.char;    // todo: refactor preservation of the background.
+        dweller.background.pos = dweller.pos;                        // More comfortable: separating static from movable objects, and keep the background information that way.
+        dweller.background.char = linMap[dweller.pos];
         seeds.forEach(function (seed) {
             seed.cycle();
-            linMap[seed.coo()] = seed.state;
+            linMap[seed.pos] = seed.state;
         });
-        linMap[dweller.coo()] = dweller.char;
+        linMap[dweller.pos] = dweller.char;
         world.innerText = linMap.join("");
 
     };
 
-    const environment = function (coo) {
+    const environment = function (pos) {
 
         moves += 1;
 
-        if (coo in objects) {
-            objects[coo].action(dweller);
+        if (pos in objects) {
+            objects[pos].action(dweller);
         }
 
         // todo: move updates to the methods?
@@ -114,11 +114,11 @@ const zdw = function () {
             char: " "
         },
         char: "@", // "🏃"
-        move: function (relX, relY) {
-            let targetCoo = u.coo(u.trans(this.pos, relX, relY));
-            const beh = behavior[linMap[targetCoo]];
-            this.pos = u.trans(this.pos, beh * relX, beh * relY);
-            environment(targetCoo);
+        move: function (x, y) {
+            let targetPos = u.trans(this.pos, x, y);
+            const beh = behavior[linMap[targetPos]];
+            this.pos = u.trans(this.pos, beh * x, beh * y);
+            environment(targetPos);
         },
         coo: function () {
             return u.coo(this.pos);
@@ -140,6 +140,7 @@ const zdw = function () {
         render();
     })
 
+
 }
 
 const map =
@@ -158,22 +159,23 @@ const u = {
     // position with a `x` and and a `y` coordinate.
     width: 10 + 1,
     coo: function (pos) {
-        const {x, y} = pos;
-        return y * this.width + x;
-    },
-    pos: function (x, y) {
+        const x = pos % this.width;
+        const y = Math.floor(pos / this.width);
         return {x: x, y: y};
     },
+    pos: function (x, y) {
+        return this.toPos( {x, y})
+    },
+    toPos: function (coo) {
+        const {x, y} = coo;
+        return y * this.width + x;
+    },
     trans: function (pos, x, y) {
-        return u.pos(pos.x + x, pos.y + y);
+        const coo = this.coo(pos);
+        return u.pos(coo.x + x, coo.y + y);
     },
     rand: function (max) {
         return Math.floor(Math.random() * Math.floor(max));
-    },
-    toPos: function (coo) {
-        const x = coo % this.width;
-        const y = Math.floor(coo / this.width);
-        return this.pos(x, y);
     }
 };
 
