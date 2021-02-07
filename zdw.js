@@ -8,27 +8,20 @@ const zdw = function () {
 
     const world = document.getElementById('zdw-world');
 
+    let linMap = map.split("");
+
     let moves = 0;
     let crops = 5;
     let credits = 0;
 
-    const behavior = {
-        "▓": 0,
-        " ": 1,
-        ".": 1,
-        "x": 1,
-        "X": 0,
-        "O": -1,
-        "n": 0,
-        "#": 0,
-        "@": 0,
-    }
+    const behavior = {};
+    objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
 
-    const Seed = function (x, y) {
+    const Seed = function (pos) {
         const sproutTime = 10 + u.rand(10);
         const growTime = 20 + u.rand(30);
         return {
-            pos: u.pos(x, y),
+            pos: pos,
             state: ".",
             age: 1,
             stages: {
@@ -75,20 +68,9 @@ const zdw = function () {
         }
     }
 
-    const seeds = [
-        Seed(1, 1),
-        Seed(2, 1),
-        Seed(1, 2),
-        Seed(2, 2),
-        Seed(1, 3),
-        Seed(2, 3),
-        Seed(1, 4),
-        Seed(2, 4)
-    ];
-
-    const Seeds = {};
-    seeds.forEach(function (seed) {
-        Seeds[seed.coo()] = seed;
+    const seeds = [];
+    linMap.forEach((char, coo) => {
+        if (char === ".") seeds.push(Seed(u.toPos(coo)));
     });
 
     const objects = {};
@@ -97,16 +79,18 @@ const zdw = function () {
     });
     objects[merchant.coo()] = merchant;
 
-    const setf = function () {
-        let linMap = map.split("");
+
+    const render = function () {
+        linMap[u.coo(dweller.background.pos)] = dweller.background.char;    // todo: refactor preservation of the background.
+        dweller.background.pos = dweller.pos;                               // More comfortable: separating static from movable objects, and keep the background information that way.
+        dweller.background.char = linMap[dweller.coo()];
         seeds.forEach(function (seed) {
             seed.cycle();
             linMap[seed.coo()] = seed.state;
-            linMap[dweller.coo()] = dweller.character;
         });
-        linMap[merchant.coo()] = "#"
-        linMap = linMap.join("");
-        world.innerText = linMap;
+        linMap[dweller.coo()] = dweller.char;
+        world.innerText = linMap.join("");
+
     };
 
     const environment = function (coo) {
@@ -125,10 +109,14 @@ const zdw = function () {
 
     const dweller = {
         pos: u.pos(3, 2),
-        character: "@", // "🏃"
+        background: {
+            pos: u.pos(3, 2),
+            char: " "
+        },
+        char: "@", // "🏃"
         move: function (relX, relY) {
             let targetCoo = u.coo(u.trans(this.pos, relX, relY));
-            const beh = targetCoo in Seeds ? behavior[Seeds[targetCoo].state] : behavior[map[targetCoo]];  // We need to find a generalized solution for that ...
+            const beh = behavior[linMap[targetCoo]];
             this.pos = u.trans(this.pos, beh * relX, beh * relY);
             environment(targetCoo);
         },
@@ -140,7 +128,7 @@ const zdw = function () {
 
     };
 
-    setf();
+    render();
     document.addEventListener('keypress', (event) => {
         const dir = {
             w: () => dweller.move(0, -1),
@@ -149,24 +137,29 @@ const zdw = function () {
             a: () => dweller.move(-1, 0)
         }
         dir[event.key]();
-        setf();
+        render();
     })
 
 }
 
 const map =
 `▓▓▓▓▓▓▓▓▓▓
-▓    ▓   ▓
-▓    O   ▓
-▓        ▓
-▓    ▓   ▓
+▓..  ▓   ▓
+▓..  O # ▓
+▓..      ▓
+▓..  ▓   ▓
 ▓▓▓▓▓▓▓▓▓▓`
 
 const u = {
+    // a coordinate `coo` is her always interpreted as the index of our
+    // linearized world. This means `coo` always a single integer that
+    // points to position in the string of the world represents that
+    // position. The position `pos` on the other hand represents that
+    // position with a `x` and and a `y` coordinate.
+    width: 10 + 1,
     coo: function (pos) {
         const {x, y} = pos;
-        const width = 10 + 1;
-        return y * width + x;
+        return y * this.width + x;
     },
     pos: function (x, y) {
         return {x: x, y: y};
@@ -176,5 +169,47 @@ const u = {
     },
     rand: function (max) {
         return Math.floor(Math.random() * Math.floor(max));
+    },
+    toPos: function (coo) {
+        const x = coo % this.width;
+        const y = Math.floor(coo / this.width);
+        return this.pos(x, y);
     }
-}
+};
+
+const objectTypes = [
+    {
+        name: "dweller",
+        char: "@",
+        behavior: 0
+    }, {
+        name: "merchant",
+        char: "#",
+        behavior: 0
+    }, {
+        name: "seed",
+        char: ".",
+        behavior: 1
+    }, {
+        name: "sprout",
+        char: "x",
+        behavior: 1
+    }, {
+        name: "plant",
+        char: "X",
+        behavior: 0
+    }, {
+        name: "nothing",
+        char: " ",
+        behavior: 1
+    }, {
+        name: "wall",
+        char: "▓",
+        behavior: 0
+    }, {
+        name: "bouncer",
+        char: "O",
+        behavior: -1
+    }
+
+];
