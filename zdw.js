@@ -2,7 +2,7 @@
 
 window.onload = function () {
     zdw();
-}
+};
 
 const zdw = function () {
 
@@ -66,7 +66,7 @@ const zdw = function () {
             crops = 0;          // todo: global variables
             credits += payout;
         }
-    }
+    };
 
     const seeds = [];
     linMap.forEach((char, pos) => {
@@ -105,7 +105,7 @@ const zdw = function () {
         document.getElementById("moves-value").innerText = moves;
         document.getElementById("crops-value").innerText = crops;
         document.getElementById("credits-value").innerText = credits;
-    }
+    };
 
     const dweller = {
         pos: u.pos(3, 2),
@@ -135,13 +135,13 @@ const zdw = function () {
             d: () => dweller.move(1, 0),
             s: () => dweller.move(0, 1),
             a: () => dweller.move(-1, 0)
-        }
+        };
         dir[event.key]();
         render();
     })
 
 
-}
+};
 
 const map =
 `▓▓▓▓▓▓▓▓▓▓
