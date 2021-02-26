@@ -65,6 +65,8 @@ const zdw = function () {
             const payout = this.buy(crops);
             crops = 0;          // todo: global variables
             credits += payout;
+            const text = "The mill is broken.";
+            document.getElementById("dialog").innerText = text;
         }
     };
 
