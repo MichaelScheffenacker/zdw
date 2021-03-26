@@ -1,5 +1,7 @@
 "use strict";
 
+import {u} from "./untils.js"
+
 window.onload = function () {
     zdw();
 };
@@ -157,33 +159,7 @@ const map =
 ▓..      ▓
 ▓▓▓▓▓▓▓▓▓▓`
 
-const u = {
-    // a coordinate `coo` is her always interpreted as the index of our
-    // linearized world. This means `coo` always a single integer that
-    // points to position in the string of the world represents that
-    // position. The position `pos` on the other hand represents that
-    // position with a `x` and and a `y` coordinate.
-    width: 10 + 1,
-    coo: function (pos) {
-        const x = pos % this.width;
-        const y = Math.floor(pos / this.width);
-        return {x: x, y: y};
-    },
-    pos: function (x, y) {
-        return this.toPos( {x, y})
-    },
-    toPos: function (coo) {
-        const {x, y} = coo;
-        return y * this.width + x;
-    },
-    trans: function (pos, x, y) {
-        const coo = this.coo(pos);
-        return u.pos(coo.x + x, coo.y + y);
-    },
-    rand: function (max) {
-        return Math.floor(Math.random() * Math.floor(max));
-    }
-};
+
 
 const objectTypes = [
     {
