@@ -10,9 +10,11 @@ const zdw = function () {
 
     let linMap = map.split("");
 
-    let moves = 0;
-    let crops = 5;
-    let credits = 0;
+    const board = {
+        moves: 0,
+        crops: 0,
+        credits: 0
+    }
 
     const behavior = {};
     objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
@@ -43,12 +45,13 @@ const zdw = function () {
                 if (this.state === "X") {
                     this.state = ".";
                     this.age = 1;
-                    crops += 1;  // todo: global variable
+                    this.board.crops += 1;
                 }
             },
             action: function () {
                 this.harvest();
-            }
+            },
+            board: board
         };
     }
 
@@ -62,12 +65,13 @@ const zdw = function () {
             return u.coo(this.pos);
         },
         action: function () {
-            const payout = this.buy(crops);
-            crops = 0;          // todo: global variables
-            credits += payout;
+            const payout = this.buy(this.board.crops);
+            this.board.crops = 0;
+            this.board.credits += payout;
             const text = "The mill is broken.";
             document.getElementById("dialog").innerText = text;
-        }
+        },
+        board: board
     };
 
     const seeds = [];
@@ -97,16 +101,16 @@ const zdw = function () {
 
     const environment = function (pos) {
 
-        moves += 1;
+        board.moves += 1;
 
         if (pos in objects) {
             objects[pos].action(dweller);
         }
 
         // todo: move updates to the methods?
-        document.getElementById("moves-value").innerText = moves;
-        document.getElementById("crops-value").innerText = crops;
-        document.getElementById("credits-value").innerText = credits;
+        document.getElementById("moves-value").innerText = board.moves;
+        document.getElementById("crops-value").innerText = board.crops;
+        document.getElementById("credits-value").innerText = board.credits;
     };
 
     const dweller = {
