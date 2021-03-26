@@ -1,6 +1,7 @@
 "use strict";
 
 import {u} from "./untils.js"
+import {merchant} from "./merchant.js";
 
 window.onload = function () {
     zdw();
@@ -17,6 +18,8 @@ const zdw = function () {
         crops: 0,
         credits: 0
     }
+
+    merchant.board = board
 
     const behavior = {};
     objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
@@ -56,25 +59,6 @@ const zdw = function () {
             board: board
         };
     }
-
-    const merchant = {
-        pos: u.pos(7, 2),
-        buy: function (amount) {
-            const unitPrice = 2;
-            return unitPrice * amount;  // payout
-        },
-        coo: function () {
-            return u.coo(this.pos);
-        },
-        action: function () {
-            const payout = this.buy(this.board.crops);
-            this.board.crops = 0;
-            this.board.credits += payout;
-            const text = "The mill is broken.";
-            document.getElementById("dialog").innerText = text;
-        },
-        board: board
-    };
 
     const seeds = [];
     linMap.forEach((char, pos) => {
