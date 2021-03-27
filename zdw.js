@@ -1,8 +1,9 @@
 "use strict";
 
 import {u} from "./untils.js"
-import {merchant} from "./merchant.js";
 import {objectTypes} from "./settings.js";
+import {merchant} from "./merchant.js";
+import {Seed} from "./seed.js";
 
 window.onload = function () {
     zdw();
@@ -25,45 +26,10 @@ const zdw = function () {
     const behavior = {};
     objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
 
-    const Seed = function (pos) {
-        const sproutTime = 10 + u.rand(10);
-        const growTime = 20 + u.rand(30);
-        return {
-            pos: pos,
-            state: ".",
-            age: 1,
-            stages: {
-                ".": {age: sproutTime, next: "x"},
-                "x": {age: growTime, next: "X"},
-                "X": {age: 0, next: ""}
-            },
-            cycle: function () {
-                const stage = this.stages[this.state];
-                if (this.age === stage.age) {
-                    this.state = stage.next;
-                }
-                this.age += 1;
-            },
-            coo: function () {
-                return u.coo(this.pos);
-            },
-            harvest: function () {
-                if (this.state === "X") {
-                    this.state = ".";
-                    this.age = 1;
-                    this.board.crops += 1;
-                }
-            },
-            action: function () {
-                this.harvest();
-            },
-            board: board
-        };
-    }
 
     const seeds = [];
     linMap.forEach((char, pos) => {
-        if (char === ".") seeds.push(Seed(pos));
+        if (char === ".") seeds.push(Seed(pos, board));
     });
 
     const objects = {};
