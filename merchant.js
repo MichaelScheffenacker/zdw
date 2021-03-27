@@ -9,12 +9,13 @@ export const merchant = {
     coo: function () {
         return u.coo(this.pos);
     },
-    action: function () {
-        const payout = this.buy(this.board.crops);
-        this.board.crops = 0;
-        this.board.credits += payout;
-        const text = "The mill is broken.";
-        document.getElementById("dialog").innerText = text;
-    },
-    board: {}
+    action: function (board) {
+        const payout = this.buy(board.crops);
+        return {
+            ...board,
+            crops: 0,
+            credits: board.credits + payout,
+            text: "The mill is broken."
+        }
+    }
 };

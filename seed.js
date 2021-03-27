@@ -1,6 +1,6 @@
 import {u} from "./untils.js";
 
-export const Seed = function (pos, board) {
+export const Seed = function (pos) {
     const sproutTime = 10 + u.rand(10);
     const growTime = 20 + u.rand(30);
     return {
@@ -22,16 +22,20 @@ export const Seed = function (pos, board) {
         coo: function () {
             return u.coo(this.pos);
         },
-        harvest: function () {
+        harvest: function (board) {
+            let crops = board.crops;
             if (this.state === "X") {
                 this.state = ".";
                 this.age = 1;
-                this.board.crops += 1;
+                crops += 1;
+            }
+            return {
+                ...board,
+                crops: crops
             }
         },
-        action: function () {
-            this.harvest();
-        },
-        board: board
+        action: function (board) {
+            return this.harvest(board);
+        }
     };
-}
+};

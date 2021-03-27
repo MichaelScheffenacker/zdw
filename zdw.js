@@ -15,17 +15,15 @@ const zdw = function () {
 
     let linMap = map.split("");
 
-    const board = {
+    let board = {
         moves: 0,
         crops: 0,
-        credits: 0
-    }
-
-    merchant.board = board
+        credits: 0,
+        text: ""
+    };
 
     const behavior = {};
     objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
-
 
     const seeds = [];
     linMap.forEach((char, pos) => {
@@ -57,13 +55,13 @@ const zdw = function () {
         board.moves += 1;
 
         if (pos in objects) {
-            objects[pos].action(dweller);
+            board = objects[pos].action(board);
         }
 
-        // todo: move updates to the methods?
         document.getElementById("moves-value").innerText = board.moves;
         document.getElementById("crops-value").innerText = board.crops;
         document.getElementById("credits-value").innerText = board.credits;
+        document.getElementById("dialog").innerText = board.text;
     };
 
     const dweller = {
@@ -107,4 +105,4 @@ const map =
 ▓..  O # ▓
 ▓..      ▓
 ▓..      ▓
-▓▓▓▓▓▓▓▓▓▓`
+▓▓▓▓▓▓▓▓▓▓`;
