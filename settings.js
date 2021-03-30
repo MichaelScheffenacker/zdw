@@ -33,3 +33,11 @@ export const objectTypes = [
         behavior: -1
     }
 ];
+
+export const rawMap =
+`▓▓▓▓▓▓▓▓▓▓
+▓..      ▓
+▓..  O # ▓
+▓..      ▓
+▓..      ▓
+▓▓▓▓▓▓▓▓▓▓`;

@@ -1,7 +1,7 @@
 "use strict";
 
 import {u} from "./untils.js"
-import {objectTypes} from "./settings.js";
+import {objectTypes, rawMap} from "./settings.js";
 import {merchant} from "./merchant.js";
 import {Seed} from "./seed.js";
 
@@ -13,7 +13,7 @@ const zdw = function () {
 
     const world = document.getElementById('zdw-world');
 
-    let linMap = map.split("");
+    let stillMap = rawMap.split("");
 
     let board = {
         moves: 0,
@@ -26,7 +26,7 @@ const zdw = function () {
     objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
 
     const seeds = [];
-    linMap.forEach((char, pos) => {
+    stillMap.forEach((char, pos) => {
         if (char === ".") seeds.push(Seed(pos, board));
     });
 
@@ -38,15 +38,13 @@ const zdw = function () {
 
 
     const render = function () {
-        linMap[dweller.background.pos] = dweller.background.char;    // todo: refactor preservation of the background.
-        dweller.background.pos = dweller.pos;                        // More comfortable: separating static from movable objects, and keep the background information that way.
-        dweller.background.char = linMap[dweller.pos];
+        const map = [...stillMap];
         seeds.forEach(function (seed) {
             seed.cycle();
-            linMap[seed.pos] = seed.state;
+            map[seed.pos] = seed.state;
         });
-        linMap[dweller.pos] = dweller.char;
-        world.innerText = linMap.join("");
+        map[dweller.pos] = dweller.char;
+        world.innerText = map.join("");
 
     };
 
@@ -66,14 +64,10 @@ const zdw = function () {
 
     const dweller = {
         pos: u.pos(3, 2),
-        background: {
-            pos: u.pos(3, 2),
-            char: " "
-        },
         char: "@", // "🏃"
         move: function (x, y) {
             let targetPos = u.trans(this.pos, x, y);
-            const beh = behavior[linMap[targetPos]];
+            const beh = behavior[stillMap[targetPos]];  // todo: why is `stillMap` here?
             this.pos = u.trans(this.pos, beh * x, beh * y);
             environment(targetPos);
         },
@@ -98,11 +92,3 @@ const zdw = function () {
     })
 
 };
-
-const map =
-`▓▓▓▓▓▓▓▓▓▓
-▓..      ▓
-▓..  O # ▓
-▓..      ▓
-▓..      ▓
-▓▓▓▓▓▓▓▓▓▓`;
