@@ -1,6 +1,6 @@
 "use strict";
 
-import {u} from "./untils.js"
+import {u} from "./utils.js"
 import {objectTypes, rawMap} from "./settings.js";
 import {merchant} from "./merchant.js";
 import {Seed} from "./seed.js";

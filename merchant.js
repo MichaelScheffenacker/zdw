@@ -1,4 +1,4 @@
-import {u} from "./untils.js"
+import {u} from "./utils.js"
 
 export const merchant = {
     pos: u.pos(7, 2),

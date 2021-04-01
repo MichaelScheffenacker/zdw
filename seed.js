@@ -1,4 +1,4 @@
-import {u} from "./untils.js";
+import {u} from "./utils.js";
 
 export const Seed = function (pos) {
     const sproutTime = 10 + u.rand(10);
