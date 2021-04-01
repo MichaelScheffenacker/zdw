@@ -1,7 +1,7 @@
 "use strict";
 
 import {u} from "./utils.js"
-import {objectTypes, rawMap} from "./settings.js";
+import {set} from "./settings.js";
 import {merchant} from "./merchant.js";
 import {Seed} from "./seed.js";
 
@@ -13,7 +13,7 @@ const zdw = function () {
 
     const world = document.getElementById('zdw-world');
 
-    let stillMap = rawMap.split("");
+    let stillMap = set.rawMap.split("");
 
     let board = {
         moves: 0,
@@ -23,7 +23,7 @@ const zdw = function () {
     };
 
     const behavior = {};
-    objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
+    set.objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
 
     const seeds = [];
     stillMap.forEach((char, pos) => {
@@ -81,13 +81,8 @@ const zdw = function () {
 
     render();
     document.addEventListener('keypress', (event) => {
-        const dir = {
-            w: () => dweller.move(0, -1),
-            d: () => dweller.move(1, 0),
-            s: () => dweller.move(0, 1),
-            a: () => dweller.move(-1, 0)
-        };
-        dir[event.key]();
+        const coo = set.dir[event.key];
+        dweller.move(coo.x, coo.y);
         render();
     })
 
