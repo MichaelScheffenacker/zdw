@@ -46,7 +46,8 @@ export const set ={
         w: { x:0, y: -1 },
         d: { x:1, y: 0 },
         s: { x:0, y: 1 },
-        a: { x:-1, y: 0 }
+        a: { x:-1, y: 0 },
+        null: {x: 0, y:0 }
     },
     rawMap: rawMap
 }

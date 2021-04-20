@@ -44,7 +44,7 @@ const zdw = function () {
             map[seed.pos] = seed.state;
         });
 
-        const delta = key ? set.dir[key] : { x:0, y: 0 };
+        const delta = set.dir[key];
         const targetPos = u.trans(dweller.pos, delta.x, delta.y);
         const beh = behavior[map[targetPos]];
         dweller.move(delta.x, delta.y, beh);
@@ -60,7 +60,7 @@ const zdw = function () {
         environment();
     };
 
-    const environment = function (pos) {
+    const environment = function () {
 
         board.moves += 1;
 
