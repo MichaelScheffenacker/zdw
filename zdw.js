@@ -37,24 +37,32 @@ const zdw = function () {
     objects[merchant.pos] = merchant;
 
 
-    const render = function () {
+    const render = function (key) {
         const map = [...stillMap];
         seeds.forEach(function (seed) {
             seed.cycle();
             map[seed.pos] = seed.state;
         });
+
+        const delta = key ? set.dir[key] : { x:0, y: 0 };
+        const targetPos = u.trans(dweller.pos, delta.x, delta.y);
+        const beh = behavior[map[targetPos]];
+        dweller.move(delta.x, delta.y, beh);
+
+        if (targetPos in objects) {
+            board = objects[targetPos].action(board);
+        }
+
+        seeds.forEach((seed) => map[seed.pos] = seed.state)
         map[dweller.pos] = dweller.char;
         world.innerText = map.join("");
 
+        environment();
     };
 
     const environment = function (pos) {
 
         board.moves += 1;
-
-        if (pos in objects) {
-            board = objects[pos].action(board);
-        }
 
         document.getElementById("moves-value").innerText = board.moves;
         document.getElementById("crops-value").innerText = board.crops;
@@ -65,11 +73,9 @@ const zdw = function () {
     const dweller = {
         pos: u.pos(3, 2),
         char: "@", // "🏃"
-        move: function (x, y) {
-            let targetPos = u.trans(this.pos, x, y);
-            const beh = behavior[stillMap[targetPos]];  // todo: why is `stillMap` here?
+        move: function (x, y, beh) {
             this.pos = u.trans(this.pos, beh * x, beh * y);
-            environment(targetPos);
+
         },
         coo: function () {
             return u.coo(this.pos);
@@ -79,11 +85,9 @@ const zdw = function () {
 
     };
 
-    render();
+    render(null);
     document.addEventListener('keypress', (event) => {
-        const coo = set.dir[event.key];
-        dweller.move(coo.x, coo.y);
-        render();
+        render(event.key);
     })
 
 };
