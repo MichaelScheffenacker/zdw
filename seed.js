@@ -5,7 +5,7 @@ export const Seed = function (pos) {
     const growTime = 20 + u.rand(30);
     return {
         pos: pos,
-        state: ".",
+        char: ".",
         age: 1,
         stages: {
             ".": {age: sproutTime, next: "x"},
@@ -13,9 +13,9 @@ export const Seed = function (pos) {
             "X": {age: 0, next: ""}
         },
         cycle: function () {
-            const stage = this.stages[this.state];
+            const stage = this.stages[this.char];
             if (this.age === stage.age) {
-                this.state = stage.next;
+                this.char = stage.next;
             }
             this.age += 1;
         },
@@ -24,8 +24,8 @@ export const Seed = function (pos) {
         },
         harvest: function (board) {
             let crops = board.crops;
-            if (this.state === "X") {
-                this.state = ".";
+            if (this.char === "X") {
+                this.char = ".";
                 this.age = 1;
                 crops += 1;
             }

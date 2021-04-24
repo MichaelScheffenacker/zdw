@@ -13,8 +13,6 @@ const zdw = function () {
 
     const world = document.getElementById('zdw-world');
 
-    let stillMap = set.rawMap.split("");
-
     let board = {
         moves: 0,
         crops: 0,
@@ -26,36 +24,44 @@ const zdw = function () {
     set.objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
 
     const seeds = [];
-    stillMap.forEach((char, pos) => {
-        if (char === ".") seeds.push(Seed(pos, board));
+    const constructors = {};
+    set.objectTypes.forEach(type => {
+        constructors[type.char] = () => Object.create({ char: type.char, action: board => board });
+        if (type.name === "seed") {
+            constructors[type.char] = () => {
+                const seed = Seed(u.pos(2, 2), board);
+                seeds.push(seed);
+                return seed;
+            };
+        }
+        if (type.name === "merchant") {
+            constructors[type.char] = () => merchant;
+        }
     });
+
+    const stillMap = Array.from(
+        set.rawMap.split(""),
+        char => constructors[char]()
+        );
 
     const objects = {};
     seeds.forEach(function (seed) {
         objects[seed.pos] = seed;
     });
-    objects[merchant.pos] = merchant;
-
 
     const render = function (key) {
-        const map = [...stillMap];
-        seeds.forEach(function (seed) {
-            seed.cycle();
-            map[seed.pos] = seed.state;
-        });
+        const map = Array.from(stillMap);
+        seeds.forEach( seed => seed.cycle() );
 
         const delta = set.dir[key];
         const targetPos = u.trans(dweller.pos, delta.x, delta.y);
-        const beh = behavior[map[targetPos]];
-        dweller.move(delta.x, delta.y, beh);
+        const target = map[targetPos]
+        const beh = behavior[target.char];
+        dweller.move(delta.x, delta.y, beh)
+        board = target.action(board);
 
-        if (targetPos in objects) {
-            board = objects[targetPos].action(board);
-        }
-
-        seeds.forEach((seed) => map[seed.pos] = seed.state)
-        map[dweller.pos] = dweller.char;
-        world.innerText = map.join("");
+        map[dweller.pos] = dweller;
+        world.innerText = Array.from(map, object => object.char).join("");
 
         environment();
     };

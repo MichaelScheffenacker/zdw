@@ -2,6 +2,7 @@ import {u} from "./utils.js"
 
 export const merchant = {
     pos: u.pos(7, 2),
+    char: "#",
     buy: function (amount) {
         const unitPrice = 2;
         return unitPrice * amount;  // payout

@@ -40,6 +40,10 @@ export const set ={
             name: "bouncer",
             char: "O",
             behavior: -1
+        }, {
+            name: "newline",
+            char: "\n",
+            behavior: 0
         }
     ],
     dir: {
