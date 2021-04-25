@@ -26,10 +26,13 @@ const zdw = function () {
     const seeds = [];
     const constructors = {};
     set.objectTypes.forEach(type => {
-        constructors[type.char] = () => Object.create({ char: type.char, action: board => board });
+        constructors[type.char] = () => Object.create({
+            char: type.char,
+            action: board => board
+        });
         if (type.name === "seed") {
-            constructors[type.char] = () => {
-                const seed = Seed(u.pos(2, 2), board);
+            constructors[type.char] = (pos) => {
+                const seed = Seed(pos);
                 seeds.push(seed);
                 return seed;
             };
@@ -41,13 +44,8 @@ const zdw = function () {
 
     const stillMap = Array.from(
         set.rawMap.split(""),
-        char => constructors[char]()
+        (char, pos) => constructors[char](pos)
         );
-
-    const objects = {};
-    seeds.forEach(function (seed) {
-        objects[seed.pos] = seed;
-    });
 
     const render = function (key) {
         const map = Array.from(stillMap);
@@ -55,9 +53,9 @@ const zdw = function () {
 
         const delta = set.dir[key];
         const targetPos = u.trans(dweller.pos, delta.x, delta.y);
-        const target = map[targetPos]
+        const target = map[targetPos];
         const beh = behavior[target.char];
-        dweller.move(delta.x, delta.y, beh)
+        dweller.move(delta.x, delta.y, beh);
         board = target.action(board);
 
         map[dweller.pos] = dweller;
