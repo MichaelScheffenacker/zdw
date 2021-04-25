@@ -6,16 +6,18 @@ export const Seed = function (pos) {
     return {
         pos: pos,
         char: ".",
+        behavior: 1,
         age: 1,
         stages: {
-            ".": {age: sproutTime, next: "x"},
-            "x": {age: growTime, next: "X"},
-            "X": {age: 0, next: ""}
+            ".": {age: sproutTime, next: "x", beh: 1},
+            "x": {age: growTime, next: "X", beh: 0},
+            "X": {age: 0, next: "", beh: 1}
         },
         cycle: function () {
             const stage = this.stages[this.char];
             if (this.age === stage.age) {
                 this.char = stage.next;
+                this.behavior = stage.beh;
             }
             this.age += 1;
         },
@@ -27,6 +29,7 @@ export const Seed = function (pos) {
             if (this.char === "X") {
                 this.char = ".";
                 this.age = 1;
+                this.behavior = 1;
                 crops += 1;
             }
             return {

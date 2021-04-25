@@ -20,15 +20,13 @@ const zdw = function () {
         text: ""
     };
 
-    const behavior = {};
-    set.objectTypes.forEach(ot => behavior[ot.char] = ot.behavior);
-
     const seeds = [];
     const constructors = {};
     set.objectTypes.forEach(type => {
         constructors[type.char] = () => Object.create({
             char: type.char,
-            action: board => board
+            action: board => board,
+            behavior: type.behavior
         });
         if (type.name === "seed") {
             constructors[type.char] = (pos) => {
@@ -52,10 +50,7 @@ const zdw = function () {
         seeds.forEach( seed => seed.cycle() );
 
         const delta = set.dir[key];
-        const targetPos = u.trans(dweller.pos, delta.x, delta.y);
-        const target = map[targetPos];
-        const beh = behavior[target.char];
-        dweller.move(delta.x, delta.y, beh);
+        const target = dweller.move(delta, map);
         board = target.action(board);
 
         map[dweller.pos] = dweller;
@@ -77,16 +72,19 @@ const zdw = function () {
     const dweller = {
         pos: u.pos(3, 2),
         char: "@", // "🏃"
-        move: function (x, y, beh) {
+        move: function (delta, map) {
+            const {x, y} = delta
+            const targetPos = u.trans(dweller.pos, x, y);
+            const target = map[targetPos];
+            const beh = target.behavior;
             this.pos = u.trans(this.pos, beh * x, beh * y);
-
+            return target
         },
         coo: function () {
             return u.coo(this.pos);
         },
         sow: function () {
         },
-
     };
 
     render(null);
