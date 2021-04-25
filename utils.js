@@ -1,6 +1,6 @@
 export const u = {
-    // coo is a 2D coordinate
-    // pos is a linearized coordinate, a single integer
+    // coo is a 2D coordinate starting at {x: 0, y: 0}
+    // pos is a linearized coordinate, a single integer, the index in the map
 
     width: 10 + 1,
     coo: function (pos) {
